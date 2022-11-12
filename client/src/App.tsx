@@ -3,23 +3,23 @@ import { useIOConnect } from "./functions/useIOConnect";
 import Spinner from "./components/Spinner";
 import JSZip from "jszip";
 import { FolderPlus, Upload } from "react-feather";
-import sendFile from "./functions/sendFile";
+import useUploadFile from "./functions/useUploadFile";
 
 function App() {
     const { activeConnections } = useIOConnect();
 
     const [files, setFiles] = useState<FileList | null>(null);
-    const [loading, setLoading] = useState(false);
+
     const [message, setMessage] = useState("");
 
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => setFiles(e.target.files);
+    const { loading, progress, sendFile } = useUploadFile();
 
     const handleClick = async () => {
         if (files?.length === 0) return;
         if (!files) return;
 
         let zippedFileName: string = "";
-        setLoading(true);
 
         const zip = JSZip();
 
@@ -33,13 +33,12 @@ function App() {
         const zippedFile = await zip.generateAsync({ type: "blob" });
         const { message } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
         setMessage(message);
-        setLoading(false);
         setFiles(null);
     };
 
     return (
         <main className="h-screen w-screen bg-slate-100 flex justify-center items-center max-md:py-4 flex-col">
-            {loading && <Spinner />}
+            {loading && <Spinner progress={progress} />}
             <ul className="my-2">
                 <li className="text-center my-2 text-lg">{message}</li>
                 {activeConnections.map((val, idx) => (
