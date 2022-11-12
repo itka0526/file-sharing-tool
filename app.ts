@@ -8,7 +8,7 @@ import fileUpload from "express-fileupload";
 
 dotenv.config();
 
-const PORT = 4000 || process.env.PORT;
+const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1gb" }));
