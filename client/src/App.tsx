@@ -15,21 +15,19 @@ function App() {
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => setFiles(e.target.files);
     const { loading, progress, sendFile } = useUploadFile();
 
-    const handleClick = async () => {
+    const handleRequest = async () => {
         if (files?.length === 0) return;
         if (!files) return;
 
         let zippedFileName: string = "";
-
         const zip = JSZip();
-        const seperator = files.length > 1 ? "|" : " ";
 
         for (let file = 0; file < files.length; file++) {
-            zippedFileName += files[file].name + seperator;
-            zip.file(files[file].name, files[file]);
+            zippedFileName = files[file].webkitRelativePath.split("/")[0] || files[file].name;
+            let fileDir = files[file].webkitRelativePath || files[file].name;
+            console.log(fileDir);
+            zip.file(fileDir, files[file]);
         }
-
-        if (zippedFileName.length >= 50) zippedFileName = zippedFileName.substring(0, 25) + "...";
 
         const zippedFile = await zip.generateAsync({ type: "blob" });
         const { message } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
@@ -73,7 +71,7 @@ function App() {
                         </label>
                         <input className="hidden" id="file" type={"file"} onChange={handleFile} multiple />
                     </div>
-                    <button className=" h-16 w-16 " onClick={handleClick}>
+                    <button className=" h-16 w-16 " onClick={handleRequest}>
                         <Upload className="h-full w-full" />
                     </button>
                 </div>
