@@ -22,6 +22,7 @@ const io = new Server(server, {
 
 type tempEntry = {
     id: string;
+    name: string;
     file: fileUpload.FileArray;
 };
 
@@ -35,12 +36,16 @@ const global: { sockets: string[]; files: tempEntry[] } = { sockets: [], files: 
 function checkActiveConnections() {
     global.sockets = Array.from(io.sockets.sockets.keys());
     io.emit("active_connections", global.sockets);
-    const urls = global.files.map(({ id }) => id);
-    io.emit("receiving_file", urls);
+}
+
+function checkActiveFiles() {
+    const identifiers = global.files.map(({ id, name }) => ({ id, name }));
+    io.emit("receiving_file", identifiers);
 }
 
 io.on("connection", (socket) => {
     checkActiveConnections();
+    checkActiveFiles();
     socket.on("sending_file", (event) => {
         socket.emit("receiving_file", event);
     });
@@ -71,8 +76,7 @@ app.get("/files", (req, res) => {
         1
     );
 
-    const urls = global.files.map(({ id }) => id);
-    io.emit("receiving_file", urls);
+    checkActiveFiles();
 });
 
 app.post("/save", fileUpload({ createParentPath: true }), (req, res) => {
@@ -80,16 +84,17 @@ app.post("/save", fileUpload({ createParentPath: true }), (req, res) => {
     const error: responseType = { status: false, message: "Error reading files" };
     const success: responseType = { status: true, message: "File is being shared" };
     try {
-        const file = req.files;
+        const file: any = req.files;
         if (!file) {
             return res.send(failed);
         } else {
-            global.files.push({ file: file, id: randomUUID() });
-            const urls = global.files.map(({ id }) => id);
-            io.emit("receiving_file", urls);
+            const name = file.file.name;
+            global.files.push({ file: file, id: randomUUID(), name: name });
+            checkActiveFiles();
             res.send(success);
         }
     } catch (err) {
+        console.log(err);
         return res.status(500).send(error);
     }
 });

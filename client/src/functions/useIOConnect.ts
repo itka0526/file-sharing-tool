@@ -5,12 +5,17 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 interface useIOConnectReturnType {
     socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
     activeConnections: string[];
-    downloadableFiles: string[];
+    downloadableFiles: identifiersType[];
+}
+
+interface identifiersType {
+    id: string;
+    name: string;
 }
 
 export const useIOConnect = (): useIOConnectReturnType => {
     const [socket, setSocket] = useState<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null);
-    const [downloadableFiles, setDownloadableFiles] = useState<string[]>([]);
+    const [downloadableFiles, setDownloadableFiles] = useState<identifiersType[]>([]);
     const [activeConnections, setActiveConnections] = useState<string[]>([]);
 
     useEffect(() => {
@@ -20,8 +25,8 @@ export const useIOConnect = (): useIOConnectReturnType => {
 
     useEffect(() => {
         if (!socket) return;
-        async function listenServer(urls: string[]) {
-            setDownloadableFiles(urls.map((url) => `/files?id=${url}`));
+        async function listenServer(identifiers: identifiersType[]) {
+            setDownloadableFiles(identifiers.map(({ id, name }) => ({ name, id: `/files?id=${id}` })));
         }
 
         socket.on("receiving_file", listenServer);

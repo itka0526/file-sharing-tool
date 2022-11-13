@@ -24,14 +24,14 @@ function App() {
         const zip = JSZip();
 
         for (let file = 0; file < files.length; file++) {
-            zippedFileName += files[file].name + "|";
+            zippedFileName += files[file].name + " ";
             zip.file(files[file].name, files[file]);
         }
 
         if (zippedFileName.length >= 50) zippedFileName = zippedFileName.substring(0, 25) + "...";
 
         const zippedFile = await zip.generateAsync({ type: "blob" });
-        const { message } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
+        const { message, status } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
         setMessage(message);
         setFiles(null);
     };
@@ -57,10 +57,10 @@ function App() {
                         <Upload className="h-full w-full" />
                     </button>
                 </div>
-                {downloadableFiles.map((val, idx) => (
-                    <li key={val}>
-                        <a href={process.env.NODE_ENV === "development" ? "http://localhost:4000" + val : val} download={true}>
-                            file_{idx}
+                {downloadableFiles.map(({ id, name }) => (
+                    <li key={id}>
+                        <a href={process.env.NODE_ENV === "development" ? "http://localhost:4000" + id : id} download={true}>
+                            {name}
                         </a>
                     </li>
                 ))}
