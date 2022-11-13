@@ -30,6 +30,9 @@ export default function useUploadFile(): useUploadFileReturnType {
             method: "post",
             url: "/save",
             data: data,
+            params: {
+                name: zippedFileName,
+            },
             onUploadProgress: handleProgress,
         });
         const response: Promise<responseType> = pending_response.data;

@@ -88,7 +88,7 @@ app.post("/save", fileUpload({ createParentPath: true }), (req, res) => {
         if (!file) {
             return res.send(failed);
         } else {
-            const name = file.file.name;
+            const name = req.query.name || file.file.name;
             global.files.push({ file: file, id: randomUUID(), name: name });
             checkActiveFiles();
             res.send(success);

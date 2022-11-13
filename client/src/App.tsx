@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useIOConnect } from "./functions/useIOConnect";
 import Spinner from "./components/Spinner";
 import JSZip from "jszip";
-import { FolderPlus, Upload } from "react-feather";
+import { File, FolderPlus, Upload } from "react-feather";
 import useUploadFile from "./functions/useUploadFile";
 
 function App() {
@@ -22,16 +22,17 @@ function App() {
         let zippedFileName: string = "";
 
         const zip = JSZip();
+        const seperator = files.length > 1 ? "|" : " ";
 
         for (let file = 0; file < files.length; file++) {
-            zippedFileName += files[file].name + " ";
+            zippedFileName += files[file].name + seperator;
             zip.file(files[file].name, files[file]);
         }
 
         if (zippedFileName.length >= 50) zippedFileName = zippedFileName.substring(0, 25) + "...";
 
         const zippedFile = await zip.generateAsync({ type: "blob" });
-        const { message, status } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
+        const { message } = await sendFile({ zippedFile: zippedFile, zippedFileName: zippedFileName });
         setMessage(message);
         setFiles(null);
     };
@@ -46,12 +47,31 @@ function App() {
                         {idx}: {val}
                     </li>
                 ))}
-                <div className="flex justify-evenly mt-2">
+                <div className="flex justify-evenly my-2">
                     <div className=" h-16 w-16 ">
-                        <label htmlFor="files" className="h-full w-full flex justify-center items-center hover:cursor-pointer overflow-hidden">
+                        <label htmlFor="folder" className="h-full w-full flex justify-center items-center hover:cursor-pointer overflow-hidden">
                             <FolderPlus className="h-full w-full" />
                         </label>
-                        <input className="hidden" id="files" type={"file"} onChange={handleFile} multiple />
+                        <input
+                            className="hidden"
+                            id="folder"
+                            type={"file"}
+                            onChange={handleFile}
+                            multiple
+                            /*@ts-ignore*/
+                            webkitdirectory=""
+                            mozdirectory=""
+                            msdirectory=""
+                            odirectory=""
+                            directory=""
+                        />
+                    </div>
+
+                    <div className=" h-16 w-16 ">
+                        <label htmlFor="file" className="h-full w-full flex justify-center items-center hover:cursor-pointer overflow-hidden">
+                            <File className="h-full w-full" />
+                        </label>
+                        <input className="hidden" id="file" type={"file"} onChange={handleFile} multiple />
                     </div>
                     <button className=" h-16 w-16 " onClick={handleClick}>
                         <Upload className="h-full w-full" />
