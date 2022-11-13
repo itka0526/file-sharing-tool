@@ -6,7 +6,7 @@ import { FolderPlus, Upload } from "react-feather";
 import useUploadFile from "./functions/useUploadFile";
 
 function App() {
-    const { activeConnections } = useIOConnect();
+    const { activeConnections, downloadableFiles } = useIOConnect();
 
     const [files, setFiles] = useState<FileList | null>(null);
 
@@ -57,6 +57,13 @@ function App() {
                         <Upload className="h-full w-full" />
                     </button>
                 </div>
+                {downloadableFiles.map((val, idx) => (
+                    <li key={val}>
+                        <a href={process.env.NODE_ENV === "development" ? "http://localhost:4000" + val : val} download={true}>
+                            file_{idx}
+                        </a>
+                    </li>
+                ))}
             </ul>
         </main>
     );
