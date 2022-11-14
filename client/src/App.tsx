@@ -25,7 +25,6 @@ function App() {
         for (let file = 0; file < files.length; file++) {
             zippedFileName = files[file].webkitRelativePath.split("/")[0] || files[file].name;
             let fileDir = files[file].webkitRelativePath || files[file].name;
-            console.log(fileDir);
             zip.file(fileDir, files[file]);
         }
 
