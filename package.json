@@ -4,8 +4,8 @@
     "description": "",
     "main": "app.js",
     "scripts": {
-        "build": "npm install && npx tsc && cd client &&  npm run build",
-        "start": "node complete/app.js",
+        "build": "npm install && npx tsc && cd client  &&  npm run build",
+        "start": "npm install && node complete/app.js",
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q complete/app.js\" "
     },
     "keywords": [],
